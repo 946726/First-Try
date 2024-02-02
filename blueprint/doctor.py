@@ -9,21 +9,37 @@ bp = Blueprint('doctor', __name__, url_prefix='/')
 @bp.route('/new_patient', methods=['POST'])
 def new_patient():
     f = request.json
-    # new_patient = PatientInfo()
-    # new_patient.id = f.get('id')
-    # new_patient.username = f.get('username')
-    # new_patient.password = f.get('password')
-    # new_patient.mobile = f.get('mobile')
-    # new_patient.address = f.get('address')
-    # new_patient.job = f.get('job')
-    # new_patient.nation = f.get('nation')
-    # new_patient.marital_status = f.get('marital_status')
-    # new_patient.emergencyContact = f.get('emergencyContact')
-    # new_patient.createDate = datetime.now
-    # new_patient.updateDate = datetime.now
+    required_fields = ['id', 'username', 'password', 'mobile', 'address', 'job', 'nation', 'marital_status',
+                       'emergencyContact']
+    id = f.get('id')
+    username = f.get('username')
+    password = f.get('password')
+    mobile = f.get('mobile')
+    address = f.get('address')
+    job = f.get('job')
+    nation = f.get('nation')
+    marital_status = f.get('marital_status')
+    emergencyContact = f.get('emergencyContact')
+    createDate = str(datetime.now())
+    updateDate = str(datetime.now())
     # db.session.add(new_patient)
     # db.session.commit()
-    return jsonify(f)
+    new_patient_obj = {
+        "id": id,
+        "username": username,
+        "password": password,
+        "mobile": mobile,
+        "address": address,
+        "job": job,
+        "nation": nation,
+        "marital_status": marital_status,
+        "emergencyContact": emergencyContact,
+        "createDate": createDate,
+        "updateDate": updateDate
+    }
+    return jsonify(new_patient_obj)
+
+
 
 
 @bp.route('/patient_info_all', methods=['GET'])
