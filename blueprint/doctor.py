@@ -9,8 +9,6 @@ bp = Blueprint('doctor', __name__, url_prefix='/')
 @bp.route('/new_patient', methods=['POST'])
 def new_patient():
     f = request.json
-    required_fields = ['id', 'username', 'password', 'mobile', 'address', 'job', 'nation', 'marital_status',
-                       'emergencyContact']
     id = f.get('id')
     username = f.get('username')
     password = f.get('password')
@@ -38,8 +36,6 @@ def new_patient():
         "updateDate": updateDate
     }
     return jsonify(new_patient_obj)
-
-
 
 
 @bp.route('/patient_info_all', methods=['GET'])
