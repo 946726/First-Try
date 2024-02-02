@@ -4,6 +4,7 @@ from flask import Flask, session, g, redirect, url_for, jsonify
 from flask_migrate import Migrate
 
 import config
+from blueprint.doctor import bp
 from exts import db
 from models import Doctor
 
@@ -14,7 +15,7 @@ app.config.from_object(config)
 db.init_app(app)
 migrate = Migrate(app, db)
 
-
+app.register_blueprint(bp)
 @app.route('/')
 def hello_world():  # put application's code here
     return 'Hello World!'
@@ -31,6 +32,8 @@ def myinfo():
         'nation': 'han'
     }
     return jsonify(patienttest)
+
+
     # return 'myinfo'
 
 
