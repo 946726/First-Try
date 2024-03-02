@@ -9,7 +9,7 @@ bp = Blueprint('doctor', __name__, url_prefix='/')
 @bp.route('/new_patient', methods=['POST'])
 def new_patient():
     """
-    创建新患者记录--text
+    创建新患者记录--test
 
     Args:
         无
@@ -20,7 +20,7 @@ def new_patient():
     # 从请求的JSON数据中获取参数
     f = request.json
     # 获取id参数
-    id = f.get('id')
+    patientid = f.get('id')
     # 获取username参数
     username = f.get('username')
     # 获取password参数
@@ -42,7 +42,7 @@ def new_patient():
     updateDate = str(datetime.now())
     # 创建一个新的患者对象字典
     new_patient_obj = {
-        "id": id,
+        "id": patientid,
         "username": username,
         "password": password,
         "mobile": mobile,
@@ -77,6 +77,8 @@ def new_patient():
             - createDate (str): 患者创建日期
             - updateDate (str): 患者更新日期
     """
+
+
 @bp.route('/patient_info_all', methods=['GET'])
 @bp.route('/patient_info_all/<pa_id>', methods=['GET'])
 def patient_info_all(pa_id=None):
@@ -99,4 +101,3 @@ def patient_info_all(pa_id=None):
         }
         # 返回 patient 的 JSON 格式化结果
         return jsonify(patient)
-
