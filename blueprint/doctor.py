@@ -65,25 +65,29 @@ def patient_info_all():
 @bp.route('/patient_info/<pa_id>', methods=['GET'])
 def patient_info_id(pa_id=None):
     patients = PatientInfo.query.filter_by(id=pa_id).all()
-    # 创建一个名为 patient 的字典，包含患者信息
-    patients_list = []
-    for patient in patients:
-        user_data = {
-            'name': patient.name,
-            'mobile': patient.mobile,
-            'idNumber': patient.idNumber
-        }
-        patients_list.append(user_data)
-    return jsonify(patients_list)
+    if not patients:
+        return jsonify({'code': '0', 'msg': '没有找到该患者信息'})
+    else:
+        # 创建一个名为 patient 的字典，包含患者信息
+        patients_list = []
+        for patient in patients:
+            user_data = {
+                'name': patient.name,
+                'mobile': patient.mobile,
+                'idNumber': patient.idNumber
+            }
+            patients_list.append(user_data)
+        return jsonify(patients_list)
+        # 返回 patient 的 JSON 格式化结果
     # 返回 patient 的 JSON 格式化结果
 
 
 @bp.route('/search', methods=['GET'])
 def search():
-    searchinfo = request.args.get("searchinfo")
-    searchinfos = PatientInfo.query.filter(or_(PatientInfo.idNumber.contains(searchinfo),
-                                               PatientInfo.name.contains(searchinfo))).all()
-    if searchinfos is None:
+    searchinfo = request.args.get('searchinfo')
+    searchinfos = PatientInfo.query.filter(or_(PatientInfo.idNumber == searchinfo,
+                                               PatientInfo.name == searchinfo)).all()
+    if not searchinfos:
         return jsonify({'code': '0', 'msg': '没有找到该患者信息'})
     else:
         searchinfos_list = []
@@ -91,7 +95,7 @@ def search():
             user_data = {
                 'name': patient.name,
                 'mobile': patient.mobile,
-                'idNumber': patient.address
+                'idNumber': patient.idNumber
             }
             searchinfos_list.append(user_data)
         return jsonify(searchinfos_list)
