@@ -1,5 +1,5 @@
 from datetime import datetime
-
+from sqlalchemy import or_
 from flask import Blueprint, render_template, request, redirect, url_for, jsonify
 from models import PatientInfo
 
@@ -17,43 +17,13 @@ def new_patient():
     Returns:
         dict: 新创建的患者对象
     """
-    # 从请求的JSON数据中获取参数
-    f = request.json
-    # 获取id参数
-    patientid = f.get('id')
-    # 获取username参数
-    username = f.get('username')
-    # 获取password参数
-    password = f.get('password')
-    # 获取mobile参数
-    mobile = f.get('mobile')
-    # 获取address参数
-    address = f.get('address')
-    # 获取job参数
-    job = f.get('job')
-    # 获取nation参数
-    nation = f.get('nation')
-    # 获取marital_status参数
-    marital_status = f.get('marital_status')
-    # 获取emergencyContact参数
-    emergencyContact = f.get('emergencyContact')
-    # 获取当前时间并转换为字符串格式作为创建日期和更新日期
-    createDate = str(datetime.now())
-    updateDate = str(datetime.now())
-    # 创建一个新的患者对象字典
-    new_patient_obj = {
-        "id": patientid,
-        "username": username,
-        "password": password,
-        "mobile": mobile,
-        "address": address,
-        "job": job,
-        "nation": nation,
-        "marital_status": marital_status,
-        "emergencyContact": emergencyContact,
-        "createDate": createDate,
-        "updateDate": updateDate
-    }
+    req_data = request.get_json()
+    new_patient_obj = PatientInfo(
+        name=req_data['name'],
+        idNumber=req_data['idNumber'],
+        mobile=req_data['mobile'],
+        address=req_data['address']
+    )
     # 返回新创建的患者对象的JSON格式数据
     return jsonify(new_patient_obj)
 
@@ -80,24 +50,48 @@ def new_patient():
 
 
 @bp.route('/patient_info_all', methods=['GET'])
-@bp.route('/patient_info_all/<pa_id>', methods=['GET'])
-def patient_info_all(pa_id=None):
-    # 如果 pa_id 为 None，则返回 "patient_info_all_peoples"
-    if pa_id is None:
-        return "patient_info_all_peoples"
-    else:
-        # 创建一个名为 patient 的字典，包含患者信息
-        patient = {
-            'id': '10000000000000',
-            'usrname': 'patienttest',
-            'mobile': '13800000000',
-            'address': "北京",
-            'job': 1,
-            'nation': 'han',
-            'marital_status': 1,
-            'emergencyContact': '13800000000',
-            'createDate': '2023-2-2',
-            'updateDate': '2023-2-2'
+def patient_info_all():
+    patients = PatientInfo.query.all()
+    patients_list = []
+    for patient in patients:
+        user_data = {
+            'idNumber': patient.idNumber,
+            'name': patient.name
         }
-        # 返回 patient 的 JSON 格式化结果
-        return jsonify(patient)
+        patients_list.append(user_data)
+    return jsonify(patients_list)
+
+
+@bp.route('/patient_info/<pa_id>', methods=['GET'])
+def patient_info_id(pa_id=None):
+    patients = PatientInfo.query.filter_by(id=pa_id).all()
+    # 创建一个名为 patient 的字典，包含患者信息
+    patients_list = []
+    for patient in patients:
+        user_data = {
+            'name': patient.name,
+            'mobile': patient.mobile,
+            'idNumber': patient.idNumber
+        }
+        patients_list.append(user_data)
+    return jsonify(patients_list)
+    # 返回 patient 的 JSON 格式化结果
+
+
+@bp.route('/search', methods=['GET'])
+def search():
+    searchinfo = request.args.get("searchinfo")
+    searchinfos = PatientInfo.query.filter(or_(PatientInfo.idNumber.contains(searchinfo),
+                                               PatientInfo.name.contains(searchinfo))).all()
+    if searchinfos is None:
+        return jsonify({'code': '0', 'msg': '没有找到该患者信息'})
+    else:
+        searchinfos_list = []
+        for patient in searchinfos:
+            user_data = {
+                'name': patient.name,
+                'mobile': patient.mobile,
+                'idNumber': patient.address
+            }
+            searchinfos_list.append(user_data)
+        return jsonify(searchinfos_list)
