@@ -18,6 +18,7 @@ class PatientInfo(db.Model):
     __tablename__ = 'patientinfo'
     id = db.Column(db.String(100), primary_key=True, nullable=False)
     name = db.Column(db.String(100), nullable=False)
+    gender = db.Column(db.Integer, nullable=False)
     idNumber = db.Column(db.String(100), primary_key=True, nullable=False)
     password = db.Column(db.String(300), nullable=False)
     mobile = db.Column(db.String(100), unique=True, nullable=False)
