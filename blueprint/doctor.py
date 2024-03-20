@@ -6,27 +6,6 @@ from models import PatientInfo
 bp = Blueprint('doctor', __name__, url_prefix='/')
 
 
-@bp.route('/new_patient', methods=['POST'])
-def new_patient():
-    """
-    创建新患者记录--test
-
-    Args:
-        无
-
-    Returns:
-        dict: 新创建的患者对象
-    """
-    req_data = request.get_json()
-    new_patient_obj = PatientInfo(
-        name=req_data['name'],
-        idNumber=req_data['idNumber'],
-        mobile=req_data['mobile'],
-        address=req_data['address']
-    )
-    # 返回新创建的患者对象的JSON格式数据
-    return jsonify(new_patient_obj)
-
 
 """
     获取患者信息列表
@@ -49,21 +28,24 @@ def new_patient():
     """
 
 
-@bp.route('/patient_info_all', methods=['GET'])
+@bp.route('/doctor/patient_info_all', methods=['GET'])
 def patient_info_all():
-    patients = PatientInfo.query.all()
+    doctor_id = request.args.get('doctor_id')
+    patients = PatientInfo.query.filter_by(doctor_id).all()
     patients_list = []
     for patient in patients:
         user_data = {
-            'idNumber': patient.idNumber,
-            'name': patient.name
+            'id': patient.id,
+            'name': patient.name,
+            'sex': patient.sex
         }
         patients_list.append(user_data)
     return jsonify(patients_list)
 
 
-@bp.route('/patient_info/<pa_id>', methods=['GET'])
-def patient_info_id(pa_id=None):
+@bp.route('/doctor/patient_info/by_id', methods=['GET'])
+def patient_info_id():
+    pa_id = request.args.get('id')
     patients = PatientInfo.query.filter_by(id=pa_id).all()
     if not patients:
         return jsonify({'code': '0', 'msg': '没有找到该患者信息'})
@@ -82,20 +64,20 @@ def patient_info_id(pa_id=None):
     # 返回 patient 的 JSON 格式化结果
 
 
-@bp.route('/search', methods=['GET'])
+@bp.route('doctor/search_patient', methods=['GET'])
 def search():
-    searchinfo = request.args.get('searchinfo')
-    searchinfos = PatientInfo.query.filter(or_(PatientInfo.idNumber == searchinfo,
-                                               PatientInfo.name == searchinfo)).all()
-    if not searchinfos:
+    search_info = request.args.get('search_info')
+    search_infos = PatientInfo.query.filter(or_(PatientInfo.idNumber == search_info,
+                                               PatientInfo.name == search_info)).all()
+    if not search_infos:
         return jsonify({'code': '0', 'msg': '没有找到该患者信息'})
     else:
         searchinfos_list = []
-        for patient in searchinfos:
+        for patient in search_infos:
             user_data = {
+                'id': patient.id,
                 'name': patient.name,
-                'mobile': patient.mobile,
-                'idNumber': patient.idNumber
+                'sex': patient.sex
             }
             searchinfos_list.append(user_data)
         return jsonify(searchinfos_list)
