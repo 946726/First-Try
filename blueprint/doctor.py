@@ -5,8 +5,6 @@ from models import PatientInfo
 
 bp = Blueprint('doctor', __name__, url_prefix='/')
 
-
-
 """
     获取患者信息列表
 
@@ -30,8 +28,8 @@ bp = Blueprint('doctor', __name__, url_prefix='/')
 
 @bp.route('/doctor/patient_info_all', methods=['GET'])
 def patient_info_all():
-    doctor_id = request.args.get('doctor_id')
-    patients = PatientInfo.query.filter_by(doctor_id).all()
+    doctor_id_now = request.args.get('doctor_id')
+    patients = PatientInfo.query.filter_by(doctor_id=doctor_id_now).all()
     patients_list = []
     for patient in patients:
         user_data = {
@@ -66,9 +64,9 @@ def patient_info_id():
 
 @bp.route('doctor/search_patient', methods=['GET'])
 def search():
-    search_info = request.args.get('search_info')
+    search_info = request.args.get("search_info")
     search_infos = PatientInfo.query.filter(or_(PatientInfo.idNumber == search_info,
-                                               PatientInfo.name == search_info)).all()
+                                                PatientInfo.name == search_info)).all()
     if not search_infos:
         return jsonify({'code': '0', 'msg': '没有找到该患者信息'})
     else:
