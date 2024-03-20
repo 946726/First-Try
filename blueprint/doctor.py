@@ -26,10 +26,9 @@ bp = Blueprint('doctor', __name__, url_prefix='/')
     """
 
 
-@bp.route('/doctor/patient_info_all', methods=['GET'])
-def patient_info_all():
-    doctor_id_now = request.args.get('doctor_id')
-    patients = PatientInfo.query.filter_by(doctor_id=doctor_id_now).all()
+@bp.route('/doctor/patient_info_all/<doctor_id>', methods=['GET'])
+def patient_info_all(doctor_id):
+    patients = PatientInfo.query.filter_by(doctor_id=doctor_id).all()
     patients_list = []
     for patient in patients:
         user_data = {
@@ -41,10 +40,9 @@ def patient_info_all():
     return jsonify(patients_list)
 
 
-@bp.route('/doctor/patient_info/by_id', methods=['GET'])
-def patient_info_id():
-    pa_id = request.args.get('id')
-    patients = PatientInfo.query.filter_by(id=pa_id).all()
+@bp.route('/doctor/patient_info_base/<patient_id>', methods=['GET'])
+def patient_info_id(patient_id):
+    patients = PatientInfo.query.filter_by(id=patient_id).all()
     if not patients:
         return jsonify({'code': '0', 'msg': '没有找到该患者信息'})
     else:
@@ -62,9 +60,8 @@ def patient_info_id():
     # 返回 patient 的 JSON 格式化结果
 
 
-@bp.route('doctor/search_patient', methods=['GET'])
-def search():
-    search_info = request.args.get("search_info")
+@bp.route('doctor/search_patient/<search_info>', methods=['GET'])
+def search(search_info: str):
     search_infos = PatientInfo.query.filter(or_(PatientInfo.idNumber == search_info,
                                                 PatientInfo.name == search_info)).all()
     if not search_infos:
